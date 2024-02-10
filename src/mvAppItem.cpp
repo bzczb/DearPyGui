@@ -1005,7 +1005,7 @@ DearPyGui::GetEntityTargetSlot(mvAppItemType type)
     case mvAppItemType::mvFontRangeHint:
     case mvAppItemType::mvNodeLink:
     case mvAppItemType::mvAnnotation:
-    case mvAppItemType::mvTag:
+    case mvAppItemType::mvPlotTag:
     case mvAppItemType::mvDragLine:
     case mvAppItemType::mvDragPoint:
     case mvAppItemType::mvDragRect:
@@ -1119,7 +1119,7 @@ DearPyGui::GetEntityValueType(mvAppItemType type)
 
     case mvAppItemType::mvDoubleValue:
     case mvAppItemType::mvDragDouble:
-    case mvAppItemType::mvTag:
+    case mvAppItemType::mvPlotTag:
     case mvAppItemType::mvInputDouble:
     case mvAppItemType::mvSliderDouble:
     case mvAppItemType::mvDragLine: return StorageValueTypes::Double;
@@ -1366,7 +1366,7 @@ DearPyGui::GetAllowableParents(mvAppItemType type)
         MV_ADD_PARENT(mvAppItemType::mvPlot)
         MV_END_PARENTS
 
-    case mvAppItemType::mvTag:
+    case mvAppItemType::mvPlotTag:
         MV_START_PARENTS
         MV_ADD_PARENT(mvAppItemType::mvStage),
         MV_ADD_PARENT(mvAppItemType::mvPlotAxis),
@@ -1570,7 +1570,7 @@ DearPyGui::GetAllowableChildren(mvAppItemType type)
         MV_ADD_CHILD(mvAppItemType::mvDragRect),
         MV_ADD_CHILD(mvAppItemType::mvDragLine),
         MV_ADD_CHILD(mvAppItemType::mvAnnotation),
-        MV_ADD_CHILD(mvAppItemType::mvTag),
+        MV_ADD_CHILD(mvAppItemType::mvPlotTag),
         MV_ADD_CHILD(mvAppItemType::mvDrawLine),
         MV_ADD_CHILD(mvAppItemType::mvDrawArrow),
         MV_ADD_CHILD(mvAppItemType::mvDrawTriangle),
@@ -3930,7 +3930,7 @@ DearPyGui::GetEntityParser(mvAppItemType type)
         setup.category = { "Plotting", "Widgets" };
         break;
     }
-    case mvAppItemType::mvTag:                  
+    case mvAppItemType::mvPlotTag:                  
     {
         AddCommonArgs(args, (CommonParserArgs)(
             MV_PARSER_ARG_ID |

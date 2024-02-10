@@ -145,7 +145,7 @@ DearPyGui::set_data_source(mvAppItem& item, mvUUID dataSource, mvAnnotationConfi
 }
 
 void
-DearPyGui::set_data_source(mvAppItem& item, mvUUID dataSource, mvTagConfig& outConfig)
+DearPyGui::set_data_source(mvAppItem& item, mvUUID dataSource, mvPlotTagConfig& outConfig)
 {
 	if (dataSource == item.config.source) return;
 	item.config.source = dataSource;
@@ -651,7 +651,7 @@ DearPyGui::draw_drag_line(ImDrawList* drawlist, mvAppItem& item, mvDragLineConfi
 }
 
 void
-DearPyGui::draw_plot_tag(ImDrawList* drawlist, mvAppItem& item, mvTagConfig& config)
+DearPyGui::draw_plot_tag(ImDrawList* drawlist, mvAppItem& item, mvPlotTagConfig& config)
 {
 	if (!item.config.show)
 		return;
@@ -2952,7 +2952,7 @@ DearPyGui::set_configuration(PyObject* inDict, mvAnnotationConfig& outConfig)
 }
 
 void
-DearPyGui::set_configuration(PyObject* inDict, mvTagConfig& outConfig)
+DearPyGui::set_configuration(PyObject* inDict, mvPlotTagConfig& outConfig)
 {
 	if (inDict == nullptr)
 		return;
@@ -3526,7 +3526,7 @@ DearPyGui::fill_configuration_dict(const mvAnnotationConfig& inConfig, PyObject*
 }
 
 void
-DearPyGui::fill_configuration_dict(const mvTagConfig& inConfig, PyObject* outDict)
+DearPyGui::fill_configuration_dict(const mvPlotTagConfig& inConfig, PyObject* outDict)
 {
 	if (outDict == nullptr)
 		return;

@@ -75,7 +75,7 @@
     X( mvDragLine ) \
     X( mvDragRect ) \
     X( mvAnnotation ) \
-    X( mvTag ) \
+    X( mvPlotTag ) \
     X( mvLineSeries ) \
     X( mvScatterSeries ) \
     X( mvStemSeries ) \

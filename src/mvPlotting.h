@@ -9,7 +9,7 @@ struct mvAnnotationConfig;
 struct mvSubPlotsConfig;
 struct mvPlotLegendConfig;
 struct mvDragLineConfig;
-struct mvTagConfig;
+struct mvPlotTagConfig;
 struct mvDragRectConfig;
 struct mvDragPointConfig;
 struct mvLineSeriesConfig;
@@ -57,7 +57,7 @@ namespace DearPyGui
     void fill_configuration_dict(const mvCandleSeriesConfig& inConfig, PyObject* outDict);
     void fill_configuration_dict(const mvCustomSeriesConfig& inConfig, PyObject* outDict);
     void fill_configuration_dict(const mvAnnotationConfig& inConfig, PyObject* outDict);
-    void fill_configuration_dict(const mvTagConfig& inConfig, PyObject* outDict);
+    void fill_configuration_dict(const mvPlotTagConfig& inConfig, PyObject* outDict);
     void fill_configuration_dict(const mvSubPlotsConfig& inConfig, PyObject* outDict);
     void fill_configuration_dict(const mvPlotAxisConfig& inConfig, PyObject* outDict);
     void fill_configuration_dict(const mvPlotConfig& inConfig, PyObject* outDict);
@@ -86,7 +86,7 @@ namespace DearPyGui
     void set_configuration(PyObject* inDict, mvCandleSeriesConfig& outConfig);
     void set_configuration(PyObject* inDict, mvCustomSeriesConfig& outConfig);
     void set_configuration(PyObject* inDict, mvAnnotationConfig& outConfig);
-    void set_configuration(PyObject* inDict, mvTagConfig& outConfig);
+    void set_configuration(PyObject* inDict, mvPlotTagConfig& outConfig);
     void set_configuration(PyObject* inDict, mvSubPlotsConfig& outConfig);
     void set_configuration(PyObject* inDict, mvPlotAxisConfig& outConfig, mvAppItem& item);
     void set_configuration(PyObject* inDict, mvPlotConfig& outConfig);
@@ -117,7 +117,7 @@ namespace DearPyGui
 
     // data source handling
     void set_data_source(mvAppItem& item, mvUUID dataSource, mvAnnotationConfig& outConfig);
-    void set_data_source(mvAppItem& item, mvUUID dataSource, mvTagConfig& outConfig);
+    void set_data_source(mvAppItem& item, mvUUID dataSource, mvPlotTagConfig& outConfig);
     void set_data_source(mvAppItem& item, mvUUID dataSource, mvDragLineConfig& outConfig);
     void set_data_source(mvAppItem& item, mvUUID dataSource, mvDragRectConfig& outConfig);
     void set_data_source(mvAppItem& item, mvUUID dataSource, mvDragPointConfig& outConfig);
@@ -150,7 +150,7 @@ namespace DearPyGui
     void draw_candle_series     (ImDrawList* drawlist, mvAppItem& item, const mvCandleSeriesConfig& config);
     void draw_custom_series     (ImDrawList* drawlist, mvAppItem& item, mvCustomSeriesConfig& config);
     void draw_plot_annotation   (ImDrawList* drawlist, mvAppItem& item, mvAnnotationConfig& config);
-    void draw_plot_tag          (ImDrawList* drawlist, mvAppItem& item, mvTagConfig& config);
+    void draw_plot_tag          (ImDrawList* drawlist, mvAppItem& item, mvPlotTagConfig& config);
 }
 
 //-----------------------------------------------------------------------------
@@ -355,7 +355,7 @@ struct mvAnnotationConfig
     ImVec2                       pixOffset;
 };
 
-struct mvTagConfig
+struct mvPlotTagConfig
 {
     std::shared_ptr<double>     value = std::make_shared<double>(0.0);
     double                      disabled_value = 0.0;
@@ -777,11 +777,11 @@ public:
     void setPyValue(PyObject* value) override;
 };
 
-class mvTag : public mvAppItem
+class mvPlotTag : public mvAppItem
 {
 public:
-    mvTagConfig configData{};
-    explicit mvTag(mvUUID uuid) : mvAppItem(uuid) {}
+    mvPlotTagConfig configData{};
+    explicit mvPlotTag(mvUUID uuid) : mvAppItem(uuid) {}
     void draw(ImDrawList* drawlist, float x, float y) override { DearPyGui::draw_plot_tag(drawlist, *this, configData); }
     void handleSpecificKeywordArgs(PyObject* dict) override { DearPyGui::set_configuration(dict, configData); }
     void getSpecificConfiguration(PyObject* dict) override { DearPyGui::fill_configuration_dict(configData, dict); }

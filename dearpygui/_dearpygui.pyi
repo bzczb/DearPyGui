@@ -5,7 +5,7 @@ from dearpygui._dearpygui import *
 # This file is generated automatically by mvPythonParser #
 ##########################################################
 
-# ~ Dear PyGui Version: master
+# ~ Dear PyGui Version: 1.11.0
 def add_2d_histogram_series(x : Union[List[float], Tuple[float, ...]], y : Union[List[float], Tuple[float, ...]], *, label: str ='', user_data: Any ='', use_internal_label: bool ='', tag: Union[int, str] ='', parent: Union[int, str] ='', before: Union[int, str] ='', source: Union[int, str] ='', show: bool ='', xbins: int ='', ybins: int ='', xmin_range: float ='', xmax_range: float ='', ymin_range: float ='', ymax_range: float ='', density: bool ='', no_outliers: bool ='', col_major: bool ='') -> Union[int, str]:
 	"""Adds a 2d histogram series."""
 	...
@@ -850,6 +850,10 @@ def get_file_dialog_info(file_dialog : Union[int, str]) -> dict:
 	"""Returns information related to the file dialog. Typically used while the file dialog is in use to query data about the state or info related to the file dialog."""
 	...
 
+def get_focused_item() -> Union[int, str]:
+	"""Returns the item currently having focus."""
+	...
+
 def get_frame_count() -> int:
 	"""Returns frame count."""
 	...
@@ -1362,6 +1366,30 @@ mvKey_ModSuper=0
 mvKey_ModShift=0
 mvKey_ModAlt=0
 mvKey_ModCtrl=0
+mvKey_Prior=0
+mvKey_Next=0
+mvKey_Select=0
+mvKey_Execute=0
+mvKey_LWin=0
+mvKey_RWin=0
+mvKey_Apps=0
+mvKey_Sleep=0
+mvKey_Volume_Down=0
+mvKey_Volume_Up=0
+mvKey_Media_Next_Track=0
+mvKey_Media_Prev_Track=0
+mvKey_Media_Stop=0
+mvKey_Media_Play_Pause=0
+mvKey_Launch_Mail=0
+mvKey_Launch_Media_Select=0
+mvKey_Launch_App1=0
+mvKey_Launch_App2=0
+mvKey_Colon=0
+mvKey_Plus=0
+mvKey_Comma=0
+mvKey_Slash=0
+mvKey_Tilde=0
+mvKey_Quote=0
 mvAll=0
 mvTool_About=0
 mvTool_Debug=0
@@ -1744,7 +1772,7 @@ mvDragPoint=0
 mvDragLine=0
 mvDragRect=0
 mvAnnotation=0
-mvTag=0
+mvPlotTag=0
 mvLineSeries=0
 mvScatterSeries=0
 mvStemSeries=0
