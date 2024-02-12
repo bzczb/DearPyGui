@@ -71,11 +71,11 @@ class DPGBuildCommand(distutils.cmd.Command):
         command.append('cmake .. -G "Visual Studio 16 2019" -A "x64" -DMVDIST_ONLY=True -DMVDPG_VERSION=')
         command.append(version_number() + " -DMV_PY_VERSION=")
         command.append(str(sys.version_info[0]) + "." + str(sys.version_info[1]) + " && ")
-        command.append("cd .. && cmake --build cmake-build-local --config Release")
+        command.append("cd .. && cmake --build cmake-build-local --config Debug")
         self.announce('Running command: %s' % "Dear PyGui Build for Windows", level=distutils.log.INFO)
         subprocess.check_call(''.join(command), env=os.environ, shell=True)
         src_path = os.path.dirname(os.path.abspath(__file__))
-        shutil.copy("cmake-build-local/DearPyGui/Release/_dearpygui.pyd", src_path +"/output/dearpygui")
+        shutil.copy("cmake-build-local/DearPyGui/Debug/_dearpygui.pyd", src_path +"/output/dearpygui")
 
     elif get_platform() == "Linux":
         command = ["mkdir cmake-build-local; "]
