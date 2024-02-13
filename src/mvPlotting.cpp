@@ -728,7 +728,7 @@ DearPyGui::draw_drag_rect(ImDrawList* drawlist, mvAppItem& item, mvDragRectConfi
 		(*config.value.get())[1] = ymin;
 		(*config.value.get())[2] = xmax;
 		(*config.value.get())[3] = ymax;
-		mvAddCallback(item.config.callback, item.uuid, nullptr, item.config.user_data);
+		mvAddCallbackJob({item.getCallback(true), item, nullptr});
 	}
 }
 
