@@ -3696,12 +3696,12 @@ void mvPlot::updateFlags()
 
 void mvPlot::updateAxesNames()
 {
-	configData.axesNames.clear();
+	for (auto& name : configData.axesNames)
+		name.clear();
 
 	for (auto& child : childslots[1])
 	{
 		mvPlotAxis* axis = static_cast<mvPlotAxis*>(child.get());
 		configData.axesNames[axis->configData.axis] = axis->config.specifiedLabel;
 	}
-
 }
