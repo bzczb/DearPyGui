@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
 #include <imgui.h>
 #include "mvAppItemState.h"
 #include "mvCallbackRegistry.h"
@@ -128,10 +129,11 @@ struct mvAppItemConfig
     bool        searchDelayed    = false;
     bool        useInternalLabel = true; // when false, will use specificed label
     bool        tracked          = false;
-    PyObject*   callback         = nullptr;
-    PyObject*   user_data        = nullptr;
-    PyObject*   dragCallback     = nullptr;
-    PyObject*   dropCallback     = nullptr;
+
+    mvPyObjectStrict callback;
+    mvPyObjectStrict user_data;
+    mvPyObjectStrict dragCallback;
+    mvPyObjectStrict dropCallback;
 };
 
 struct mvAppItemDrawInfo
@@ -147,7 +149,7 @@ struct mvAppItemDrawInfo
 //-----------------------------------------------------------------------------
 // mvAppItem
 //-----------------------------------------------------------------------------
-class mvAppItem
+class mvAppItem : public std::enable_shared_from_this<mvAppItem>
 {
 
 public:
@@ -208,7 +210,8 @@ public:
     //-----------------------------------------------------------------------------
     // callbacks
     //-----------------------------------------------------------------------------
-    [[nodiscard]] PyObject* getCallback(b8 ignore_enabled = true);  // returns the callback. If ignore_enable false and item is disabled then no callback will be returned.
+    // returns the callback. If ignore_enable false and item is disabled then no callback will be returned.
+    [[nodiscard]] std::shared_ptr<mvPyObjectStrict> getCallback(b8 ignore_enabled = true);
        
     //-----------------------------------------------------------------------------
     // config setters

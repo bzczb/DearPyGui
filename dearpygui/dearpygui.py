@@ -8191,7 +8191,7 @@ def draw_rectangle(pmin : Union[List[float], Tuple[float, ...]], pmax : Union[Li
 		parent (Union[int, str], optional): Parent to add this item to. (runtime adding)
 		before (Union[int, str], optional): This item will be displayed before the specified item in the parent.
 		show (bool, optional): Attempt to render widget.
-		color (Union[List[int], Tuple[int, ...]], optional): 
+		color (Union[List[int], Tuple[int, ...]], optional):
 		color_upper_left (Union[List[int], Tuple[int, ...]], optional): 'multicolor' must be set to 'True'
 		color_upper_right (Union[List[int], Tuple[int, ...]], optional): 'multicolor' must be set to 'True'
 		color_bottom_right (Union[List[int], Tuple[int, ...]], optional): 'multicolor' must be set to 'True'
@@ -9233,6 +9233,54 @@ def set_decimal_point(decimal_point : str, **kwargs) -> None:
 	"""
 
 	return internal_dpg.set_decimal_point(decimal_point, **kwargs)
+
+def set_drag_enter_callback(callback : Callable, *, user_data: Any =None, **kwargs) -> str:
+	"""	 Sets a callback to run when user drags an item into the window.
+
+	Args:
+		callback (Callable): 
+		user_data (Any, optional): New in 1.3. Optional user data to send to the callback
+	Returns:
+		str
+	"""
+
+	return internal_dpg.set_drag_enter_callback(callback, user_data=user_data, **kwargs)
+
+def set_drag_leave_callback(callback : Callable, *, user_data: Any =None, **kwargs) -> str:
+	"""	 Sets a callback to run when user leaves the window while dragging an item.
+
+	Args:
+		callback (Callable): 
+		user_data (Any, optional): New in 1.3. Optional user data to send to the callback
+	Returns:
+		str
+	"""
+
+	return internal_dpg.set_drag_leave_callback(callback, user_data=user_data, **kwargs)
+
+def set_drag_over_callback(callback : Callable, *, user_data: Any =None, **kwargs) -> str:
+	"""	 Sets a callback to run while user is dragging an item in the window.
+
+	Args:
+		callback (Callable): 
+		user_data (Any, optional): New in 1.3. Optional user data to send to the callback
+	Returns:
+		str
+	"""
+
+	return internal_dpg.set_drag_over_callback(callback, user_data=user_data, **kwargs)
+
+def set_drop_callback(callback : Callable, *, user_data: Any =None, **kwargs) -> str:
+	"""	 Sets a callback to run when user drops an item into the window.
+
+	Args:
+		callback (Callable): 
+		user_data (Any, optional): New in 1.3. Optional user data to send to the callback
+	Returns:
+		str
+	"""
+
+	return internal_dpg.set_drop_callback(callback, user_data=user_data, **kwargs)
 
 def set_exit_callback(callback : Callable, *, user_data: Any =None, **kwargs) -> str:
 	"""	 Sets a callback to run on last frame.

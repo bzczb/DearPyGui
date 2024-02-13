@@ -118,8 +118,8 @@ struct mvGroupConfig
 struct mvDragPayloadConfig
 {
     std::string payloadType = "$$DPG_PAYLOAD";
-    PyObject*   dragData = nullptr;
-    PyObject*   dropData = nullptr;
+    mvPyObjectStrictPtr dragData = nullptr;
+    mvPyObjectStrictPtr dropData = nullptr;
 };
 
 struct mvCollapsingHeaderConfig
@@ -160,7 +160,6 @@ struct mvWindowAppItemConfig
     bool             no_close = false;
     bool             no_background = false;
     bool             collapsed = false;
-    bool             unsaved_document = false;
     bool             no_open_over_existing_popup = true;
     PyObject*        on_close = nullptr;
     mvVec2           min_size = { 100.0f, 100.0f };
@@ -289,5 +288,4 @@ public:
     void draw(ImDrawList* drawlist, float x, float y) override { DearPyGui::draw_window(drawlist, *this, configData); }
     void handleSpecificKeywordArgs(PyObject* dict) override { DearPyGui::set_configuration(dict, *this, configData); }
     void getSpecificConfiguration(PyObject* dict) override { DearPyGui::fill_configuration_dict(configData, dict); }
-    ~mvWindowAppItem() { PyObject* callback = configData.on_close; mvSubmitCallback([callback]() { if (callback) Py_XDECREF(callback);});}
 };
