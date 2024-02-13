@@ -4144,6 +4144,7 @@ get_callback_queue(PyObject* self, PyObject* args, PyObject* kwargs)
 	PyObject* pArgs = PyTuple_New(GContext->callbackRegistry->jobs.size());
 	for (size_t i = 0; i < GContext->callbackRegistry->jobs.size(); i++)
 	{
+		// std::cout << "[JOB]: " << GContext->callbackRegistry->jobs[i].sender_str << std::endl;
 		PyObject* job_py = mvCallbackJob::to_python_tuple(std::move(GContext->callbackRegistry->jobs[i]));
 		PyTuple_SetItem(pArgs, i, job_py);
 	}

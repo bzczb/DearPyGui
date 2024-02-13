@@ -12,6 +12,7 @@ void mvHandlerRegistry::draw(ImDrawList* drawlist, float x, float y)
 
 void mvKeyDownHandler::draw(ImDrawList* drawlist, float x, float y)
 {
+	auto _key = this->_key;
 	if (_key == ImGuiKey_None)
 	{
 		for (int i = ImGuiKey_NamedKey_BEGIN; i < ImGuiKey_NamedKey_END; i++)
@@ -19,14 +20,16 @@ void mvKeyDownHandler::draw(ImDrawList* drawlist, float x, float y)
 			auto key = ImGui::GetKeyData(static_cast<ImGuiKey>(i));
 			if (key->Down)
 			{
-				mvAddCallbackJob({*this, MV_APP_DATA_FUNC(ToPyMPair(i, ImGui::GetIO().KeysDownDuration[i]))}, false);
+				auto downDuration = key->DownDuration;
+				mvAddCallbackJob({*this, MV_APP_DATA_FUNC(ToPyMPair(i, downDuration))}, false);
 			}
 		}
 	}
 
 	else if (ImGui::IsKeyDown(_key))
 	{
-		mvAddCallbackJob({*this, MV_APP_DATA_FUNC(ToPyMPair(_key, ImGui::GetIO().KeysDownDuration[_key]))}, false);
+		auto downDuration = ImGui::GetKeyData(_key)->DownDurationPrev;
+		mvAddCallbackJob({*this, MV_APP_DATA_FUNC(ToPyMPair(_key, downDuration))}, false);
 	}
 }
 
@@ -56,6 +59,7 @@ void mvKeyDownHandler::getSpecificConfiguration(PyObject* dict)
 
 void mvKeyPressHandler::draw(ImDrawList* drawlist, float x, float y)
 {
+	auto _key = this->_key;
 	if (_key == ImGuiKey_None)
 	{
 		for (int i = ImGuiKey_NamedKey_BEGIN; i < ImGuiKey_NamedKey_END; i++)
@@ -111,6 +115,7 @@ void mvKeyPressHandler::getSpecificConfiguration(PyObject* dict)
 
 void mvKeyReleaseHandler::draw(ImDrawList* drawlist, float x, float y)
 {
+	auto _key = this->_key;
 	if (_key == ImGuiKey_None)
 	{
 		for (int i = ImGuiKey_NamedKey_BEGIN; i < ImGuiKey_NamedKey_END; i++)

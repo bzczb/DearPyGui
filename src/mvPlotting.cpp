@@ -393,34 +393,32 @@ DearPyGui::draw_plot(ImDrawList* drawlist, mvAppItem& item, mvPlotConfig& config
 		if (config._useColorMap)
 			ImPlot::PopColormap();
 
-		if (item.config.callback != nullptr && config.rects.size() > 0)
+		if (item.config.callback && config.rects.size() > 0)
 		{
-			for(auto rect : config.rects) {
-				const std::string sender = item.config.alias.empty() ? std::to_string(item.uuid) : item.config.alias;
-				mvSubmitCallback([=, &item]() {
-					PyObject* result = PyTuple_New(config.rects.size());
-					for (int i = 0; i < config.rects.size(); ++i) {
-						auto rectMin = config.rects[i].Min();
-						auto rectMax = config.rects[i].Max();
-						PyTuple_SetItem(result, i, Py_BuildValue("(dddd)", rectMin.x, rectMin.y, rectMax.x, rectMax.y));
-					}
-					mvAddCallback(item.config.callback, sender, result, item.config.user_data);
-				});
-			}
-		}
-
-		if (item.config.callback && config._queried)
-		{
-			auto appDataFunc = [queryArea = config._queryArea]() {
-				PyObject* area = PyTuple_New(4);
-				PyTuple_SetItem(area, 0, PyFloat_FromDouble(queryArea[0]));
-				PyTuple_SetItem(area, 1, PyFloat_FromDouble(queryArea[1]));
-				PyTuple_SetItem(area, 2, PyFloat_FromDouble(queryArea[2]));
-				PyTuple_SetItem(area, 3, PyFloat_FromDouble(queryArea[3]));
-				return area;
+			auto appDataFunc = [rects = config.rects]() {
+				PyObject* result = PyTuple_New(rects.size());
+				for (int i = 0; i < rects.size(); ++i) {
+					auto rectMin = rects[i].Min();
+					auto rectMax = rects[i].Max();
+					PyTuple_SetItem(result, i, Py_BuildValue("(dddd)", rectMin.x, rectMin.y, rectMax.x, rectMax.y));
+				}
+				return result;
 			};
 			mvSubmitAddCallbackJob({&item.config.callback, item, appDataFunc});
 		}
+
+		if (ImPlot::IsPlotSelected()) {
+            ImPlotRect select = ImPlot::GetPlotSelection();
+            if (ImGui::IsMouseClicked(ImPlot::GetInputMap().SelectCancel)) {
+                ImPlot::CancelPlotSelection();
+                config.rects.push_back(select);
+            }
+        }
+        for (int i = 0; i < config.rects.size(); ++i) {
+			// TODO: Implement flags
+			// TODO: how to delete?
+            ImPlot::DragRect(i,&config.rects[i].X.Min,&config.rects[i].Y.Min,&config.rects[i].X.Max,&config.rects[i].Y.Max,ImVec4(1,0,1,1));
+        }
 
 		if (ImPlot::IsPlotHovered())
 		{
@@ -560,10 +558,7 @@ DearPyGui::draw_plot_axis(ImDrawList* drawlist, mvAppItem& item, mvPlotAxisConfi
 	{
 		const ImGuiPayload* payload;
 		ScopedID id(item.uuid);
-		if ((item.info.location == 0 && ImPlot::BeginDragDropTargetX() &&
-				(payload = ImGui::AcceptDragDropPayload(item.config.payloadType.c_str()))) ||
-			(ImPlot::BeginDragDropTargetY(item.info.location - 1) &&
-				(payload = ImGui::AcceptDragDropPayload(item.config.payloadType.c_str()))))
+		if (ImPlot::BeginDragDropTargetAxis(config.axis) && (payload = ImGui::AcceptDragDropPayload(item.config.payloadType.c_str())))
 		{
 			auto dropCallbackPtr = mvPyObjectStrictPtr(item.shared_from_this(), &item.config.dropCallback);
 			mvUUID payloadUuid = *static_cast<const mvUUID*>(payload->Data);
