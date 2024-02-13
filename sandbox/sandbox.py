@@ -1,10 +1,13 @@
 
 import dearpygui.dearpygui as dpg
+import dearpygui.demo as demo
 import time
 
 dpg.create_context()
 dpg.create_viewport()
 dpg.setup_dearpygui()
+
+demo.show_demo()
 
 i = 0
 
@@ -23,7 +26,7 @@ with dpg.window(label="Example Window", tag="Window"):
     dpg.add_text("Viewport Height: ", tag="ViewportHeightText")
     dpg.add_text("Time: ", tag="LastViewportSizeUpdateText")
 
-dpg.set_primary_window("Window", True)
+# dpg.set_primary_window("Window", True)
 
 dpg.show_viewport()
 dpg.start_dearpygui()
