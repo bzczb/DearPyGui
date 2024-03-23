@@ -180,14 +180,14 @@ def setup_package():
             shutil.copy(src_path + "/thirdparty/Microsoft/vcruntime140_1.dll", src_path + "/output/dearpygui")
 
     metadata = dict(
-        name='dearpygui',                                      # Required
-        version=version_number(),                              # Required
-        author="Jonathan Hoffstadt and Preston Cothren",       # Optional
-        author_email="jonathanhoffstadt@yahoo.com",            # Optional
-        description='DearPyGui: A simple Python GUI Toolkit',  # Required
-        long_description=long_description,                     # Optional
-        long_description_content_type='text/markdown',         # Optional
-        url='https://github.com/hoffstadt/DearPyGui',          # Optional
+        name='dearpygui-gram',                                               # Required
+        version=version_number(),                                            # Required
+        author="Jonathan Hoffstadt and Preston Cothren, bzczb",              # Optional
+        author_email="uqzx@protonmail.com",                                  # Optional
+        description='DearPyGui: A simple Python GUI Toolkit ... gram fork',  # Required
+        long_description=long_description,                                   # Optional
+        long_description_content_type='text/markdown',                       # Optional
+        url='https://github.com/bzczb/DearPyGui',                            # Optional
         license = 'MIT',
         python_requires='>=3.7',
         classifiers=[
