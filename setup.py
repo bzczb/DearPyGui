@@ -64,6 +64,8 @@ class DPGBuildCommand(distutils.cmd.Command):
         self.announce('Using readthedocs hack',level=distutils.log.INFO)
         return
 
+    cmake_debug = os.getenv('DPG_CMAKE_DEBUG', 'Release')
+
     if get_platform() == "Windows":
         if vs_version := os.getenv('DPG_VS_VERSION', None):
             pass
@@ -77,28 +79,29 @@ class DPGBuildCommand(distutils.cmd.Command):
         else:
             assert False, f'Unknown Visual Studio version: {vs_version}'
         cmake_path = 'Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin'
-        command = 'set PATH="'
+        command = []
+        command.append('set PATH=')
         for vs_edition in ('Community', 'Enterprise', 'Professional'):
             vs_path = '\\'.join((vs_base_path, vs_edition, cmake_path))
-            command += vs_path + ';'
-        command += '%PATH% && '
+            command.append('"' + vs_path + '";')
+        command.append('%PATH% && ')
 
         command.append("mkdir cmake-build-local && ")
         command.append("cd cmake-build-local && ")
         command.append('cmake .. -G "{}" -A "x64" -DMVDIST_ONLY=True -DMVDPG_VERSION='.format(vs_version))
         command.append(version_number() + " -DMV_PY_VERSION=")
         command.append(str(sys.version_info[0]) + "." + str(sys.version_info[1]) + " && ")
-        command.append("cd .. && cmake --build cmake-build-local --config Debug")
+        command.append("cd .. && cmake --build cmake-build-local --config {}".format(cmake_debug))
         self.announce('Running command: %s' % "Dear PyGui Build for Windows", level=distutils.log.INFO)
         subprocess.check_call(''.join(command), env=os.environ, shell=True)
         src_path = os.path.dirname(os.path.abspath(__file__))
-        shutil.copy("cmake-build-local/DearPyGui/Debug/_dearpygui.pyd", src_path +"/output/dearpygui")
+        shutil.copy("cmake-build-local/DearPyGui/{}/_dearpygui.pyd".format(cmake_debug), src_path +"/output/dearpygui")
 
     elif get_platform() == "Linux":
         command = ["mkdir cmake-build-local; "]
         command.append("cd cmake-build-local; ")
         command.append('cmake .. -DMVDIST_ONLY=True -DMVDPG_VERSION='+version_number()+ " -DMV_PY_VERSION="+ str(sys.version_info[0]) + "." + str(sys.version_info[1])+"; ")
-        command.append("cd ..; cmake --build cmake-build-local --config Release")
+        command.append("cd ..; cmake --build cmake-build-local --config {}".format(cmake_debug))
         self.announce('Running command: %s' % "Dear PyGui Build for Linux",level=distutils.log.INFO)
         subprocess.check_call(''.join(command), shell=True)
         src_path = os.path.dirname(os.path.abspath(__file__))
@@ -108,7 +111,7 @@ class DPGBuildCommand(distutils.cmd.Command):
         command = ["mkdir cmake-build-local; "]
         command.append("cd cmake-build-local; ")
         command.append('cmake .. -DMVDIST_ONLY=True -DMVDPG_VERSION='+version_number()+ " -DMV_PY_VERSION="+ str(sys.version_info[0]) + "." + str(sys.version_info[1])+"; ")
-        command.append("cd ..; cmake --build cmake-build-local --config Release")
+        command.append("cd ..; cmake --build cmake-build-local --config {}".format(cmake_debug))
         self.announce('Running command: %s' % "Dear PyGui Build for OS X",level=distutils.log.INFO)
         subprocess.check_call(''.join(command), shell=True)
         src_path = os.path.dirname(os.path.abspath(__file__))
