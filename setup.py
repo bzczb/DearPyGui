@@ -65,10 +65,27 @@ class DPGBuildCommand(distutils.cmd.Command):
         return
 
     if get_platform() == "Windows":
-        command = [r'set PATH="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin";"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin";"C:\Program Files\Microsoft Visual Studio\2022\Professional\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin";%PATH% && ']
+        if vs_version := os.getenv('DPG_VS_VERSION', None):
+            pass
+        else:
+            vs_version = 'Visual Studio 16 2019'
+
+        if vs_version == 'Visual Studio 16 2019':
+            vs_base_path = 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2019'
+        elif vs_version == 'Visual Studio 17 2022':
+            vs_base_path = 'C:\\Program Files\\Microsoft Visual Studio\\2022'
+        else:
+            assert False, f'Unknown Visual Studio version: {vs_version}'
+        cmake_path = 'Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin'
+        command = 'set PATH="'
+        for vs_edition in ('Community', 'Enterprise', 'Professional'):
+            vs_path = '\\'.join((vs_base_path, vs_edition, cmake_path))
+            command += vs_path + ';'
+        command += '%PATH% && '
+
         command.append("mkdir cmake-build-local && ")
         command.append("cd cmake-build-local && ")
-        command.append('cmake .. -G "Visual Studio 17 2022" -A "x64" -DMVDIST_ONLY=True -DMVDPG_VERSION=')
+        command.append('cmake .. -G "{}" -A "x64" -DMVDIST_ONLY=True -DMVDPG_VERSION='.format(vs_version))
         command.append(version_number() + " -DMV_PY_VERSION=")
         command.append(str(sys.version_info[0]) + "." + str(sys.version_info[1]) + " && ")
         command.append("cd .. && cmake --build cmake-build-local --config Debug")

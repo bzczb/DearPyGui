@@ -7,11 +7,6 @@ on:
 
   workflow_dispatch:
 
-    branches:
-      - master
-      - development
-      - development_*
-
     inputs:
     
       version:
@@ -231,7 +226,7 @@ jobs:
 
     - name: Test PyPi Deployment
       shell: cmd
-      if: "contains(github.event.inputs.deploytest, 'true')"
+      if: contains(github.event.inputs.deploytest, 'true')
       run: |
         dir
         python -m twine upload --repository testpypi windowsbuild*/* -u __token__ -p ${{ secrets.TEST_PYPI_PASSWORD }} --skip-existing
