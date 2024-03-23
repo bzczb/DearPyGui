@@ -2,8 +2,8 @@ name: Embedded Build
 
 on:
 
-  schedule:
-    - cron: '0 1 * * 1'
+  # schedule:
+  #   - cron: '0 1 * * 1'
 
   push:
 
