@@ -23,6 +23,11 @@ on:
         description: 'Deploy (true will deploy to test pypi)'
         required: false
         default: 'false'
+    
+      release:
+        description: 'Make github release'
+        required: false
+        default: 'false'
 
 jobs:
 
@@ -31,7 +36,8 @@ jobs:
     runs-on: windows-2019
     strategy:
       matrix:
-        python-version: [ 3.8, 3.9, "3.10", "3.11", "3.12" ]
+        python-version: [ "3.12" ]
+        # python-version: [ 3.8, 3.9, "3.10", "3.11", "3.12" ]
 
     steps:
 
@@ -74,7 +80,8 @@ jobs:
     runs-on: macos-11
     strategy:
       matrix:
-        python-version: [ 3.8, 3.9, "3.10", "3.11", "3.12" ]
+        python-version: [ "3.12" ]
+        # python-version: [ 3.8, 3.9, "3.10", "3.11", "3.12" ]
 
     steps:
 
@@ -159,7 +166,8 @@ jobs:
       CXX: g++-9
     strategy:
       matrix:
-        python-version: [ 3.8, 3.9, "3.10", "3.11", "3.12" ]
+        python-version: [ "3.12" ]
+        # python-version: [ 3.8, 3.9, "3.10", "3.11", "3.12" ]
 
     steps:
 
@@ -236,3 +244,12 @@ jobs:
         python -m twine upload --repository testpypi apple10build*/* -u __token__ -p ${{ secrets.TEST_PYPI_PASSWORD }} --skip-existing
         python -m twine upload --repository testpypi linuxbuild*/* -u __token__ -p ${{ secrets.TEST_PYPI_PASSWORD }} --skip-existing
       # python -m twine upload --repository testpypi apple10sbuild*/* -u __token__ -p ${{ secrets.TEST_PYPI_PASSWORD }} --skip-existing
+
+    - name: Release
+      if: contains(github.event.inputs.release, 'true')
+      uses: softprops/action-gh-release@v2
+      with:
+        files:
+          windowsbuild*/*
+          apple10build*/*
+          linuxbuild*/*
