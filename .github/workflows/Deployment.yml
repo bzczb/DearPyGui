@@ -199,6 +199,32 @@ jobs:
         path: ${{ github.workspace }}/dist/*.whl
         retention-days: 2
 
+  releases:
+    
+    needs: [build-windows-wheels, build-mac10-wheels, build-linux-wheels]  # build-mac-silicon-wheels
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: wheel-artifacts
+
+    - name: List files
+      run: |
+        ls -lahR wheel-artifacts
+
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files:
+          wheel-artifacts/**/*.whl
+
   deploy-packages:
 
     needs: [build-windows-wheels, build-mac10-wheels, build-linux-wheels]  # build-mac-silicon-wheels
@@ -239,12 +265,3 @@ jobs:
         python -m twine upload --repository testpypi apple10build*/* -u __token__ -p ${{ secrets.TEST_PYPI_PASSWORD }} --skip-existing
         python -m twine upload --repository testpypi linuxbuild*/* -u __token__ -p ${{ secrets.TEST_PYPI_PASSWORD }} --skip-existing
       # python -m twine upload --repository testpypi apple10sbuild*/* -u __token__ -p ${{ secrets.TEST_PYPI_PASSWORD }} --skip-existing
-
-    - name: Release
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v2
-      with:
-        files:
-          windowsbuild*/*
-          apple10build*/*
-          linuxbuild*/*
