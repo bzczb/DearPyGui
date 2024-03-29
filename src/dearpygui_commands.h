@@ -3130,6 +3130,12 @@ reorder_items(PyObject* self, PyObject* args, PyObject* kwargs)
 		}
 	}
 	children = newchildren;
+
+	if (slot == 1 && parent->type == mvAppItemType::mvTable)
+	{
+		auto pTable = static_cast<mvTable*>(parent);
+		pTable->onChildrenReordered();
+	}
 	return GetPyNone();
 }
 

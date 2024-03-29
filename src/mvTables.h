@@ -58,6 +58,7 @@ public:
     void onChildAdd(std::shared_ptr<mvAppItem> item);
     void onChildRemoved(std::shared_ptr<mvAppItem> item);
     void onChildrenRemoved();
+    void onChildrenReordered();
 
     // values
     PyObject* getPyValue() override;
@@ -92,6 +93,9 @@ public:
     std::vector<ImU32> _rowColors;
     std::vector<ImU32> _rowSelectionColors;
     std::vector<std::vector<ImU32>> _cellColors;
+
+    std::vector<mvUUID> _rowIDs;
+    std::vector<mvUUID> _columnIDs;
 
     struct SortSpec
     {

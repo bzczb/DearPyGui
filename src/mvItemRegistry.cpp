@@ -1515,15 +1515,7 @@ AddItemWithRuntimeChecks(mvItemRegistry& registry, std::shared_ptr<mvAppItem> it
     //---------------------------------------------------------------------------
     if (item->type == mvAppItemType::mvTooltip)
     {
-        if (parentPtr->info.parentPtr->type == mvAppItemType::mvTable)
-        {
-            parentPtr->info.parentPtr->childslots[2][parentPtr->info.location] = item;
-            return true;
-        }
-        else
-        {
-            return AddItemAfter(registry, parent, item);
-        }
+        return AddItemAfter(registry, parent, item);
     }
 
     //---------------------------------------------------------------------------

@@ -6,6 +6,8 @@
 #include "mvFontItems.h"
 #include "mvThemes.h"
 
+#include <unordered_map>
+
 mvTableCell::mvTableCell(mvUUID uuid)
 	: mvAppItem(uuid)
 {
@@ -235,17 +237,6 @@ void mvTable::draw(ImDrawList* drawlist, float x, float y)
 					const char* column_name = ImGui::TableGetColumnName(column); // Retrieve name passed to TableSetupColumn()
 					ImGui::PushID(column);
 					ImGui::TableHeader(column_name);
-
-					if (childslots[2][column])
-					{
-						// columns
-						auto& item = childslots[2][column];
-						// skip item if it's not shown
-						if (!item->config.show)
-							continue;
-
-						item->draw(drawlist, ImGui::GetCursorPosX(), ImGui::GetCursorPosY());
-					}
 					ImGui::PopID();
 				}
 
@@ -392,6 +383,7 @@ void mvTable::onChildAdd(std::shared_ptr<mvAppItem> item)
 		_columns++;
 		_columnColors.push_back(ImGui::ColorConvertFloat4ToU32(ImVec4(0.0f, 0.0f, 0.0f, 0.0f)));
 		_columnColorsSet.push_back(false);
+		_columnIDs.push_back(item->uuid);
 
 		for (int i = 0; i < childslots[1].size(); i++)
 		{
@@ -401,7 +393,6 @@ void mvTable::onChildAdd(std::shared_ptr<mvAppItem> item)
 				_cellColors[i].push_back(ImGui::ColorConvertFloat4ToU32(ImVec4(0.0f, 0.0f, 0.0f, 0.0f)));
 			}
 		}
-		childslots[2].push_back(nullptr);
 	}
 
 	else if (item->type == mvAppItemType::mvTableRow)
@@ -412,6 +403,7 @@ void mvTable::onChildAdd(std::shared_ptr<mvAppItem> item)
 		_rowColorsSet.insert(_rowColorsSet.begin() + location, false);
 		_rowSelectionColors.insert(_rowSelectionColors.begin() + location, ImGui::ColorConvertFloat4ToU32(ImVec4(0.0f, 0.0f, 0.0f, 0.0f)));
 		_rowSelectionColorsSet.insert(_rowSelectionColorsSet.begin() + location, false);
+		_rowIDs.insert(_rowIDs.begin() + location, item->uuid);
 
 		// TODO: OMFG, this needs to be fixed, too.
 		_cellColorsSet.push_back({});
@@ -429,10 +421,10 @@ void mvTable::onChildRemoved(std::shared_ptr<mvAppItem> item)
 	int location = item->info.location;
 	if (item->type == mvAppItemType::mvTableColumn)
 	{
-		childslots[2][location] = nullptr;
 		_columns--;
 		_columnColors.erase(_columnColors.begin() + location);
 		_columnColorsSet.erase(_columnColorsSet.begin() + location);
+		_columnIDs.erase(_columnIDs.begin() + location);
 	}
 	else if (item->type == mvAppItemType::mvTableRow)
 	{
@@ -441,6 +433,7 @@ void mvTable::onChildRemoved(std::shared_ptr<mvAppItem> item)
 		_rowColorsSet.erase(_rowColorsSet.begin() + location);
 		_rowSelectionColors.erase(_rowSelectionColors.begin() + location);
 		_rowSelectionColorsSet.erase(_rowSelectionColorsSet.begin() + location);
+		_rowIDs.erase(_rowIDs.begin() + location);
 		_cellColorsSet.erase(_cellColorsSet.begin() + location);
 		_cellColors.erase(_cellColors.begin() + location);
 	}
@@ -457,12 +450,66 @@ void mvTable::onChildrenRemoved()
 	_rowColorsSet.clear();
 	_rowSelectionColors.clear();
 	_rowSelectionColorsSet.clear();
+	_rowIDs.clear();
 
 	for (int i = 0; i < _columns; i++)
 	{
 		_columnColors.push_back(ImGui::ColorConvertFloat4ToU32(ImVec4(0.0f, 0.0f, 0.0f, 0.0f)));
 		_columnColorsSet.push_back(false);
 	}
+}
+
+void mvTable::onChildrenReordered()
+{
+	IM_ASSERT(_rowIDs.size() == childslots[1].size());
+	auto ids_to_index = std::unordered_map<mvUUID, int>();
+	for (int i = 0; i < _rowIDs.size(); i++)
+		ids_to_index[_rowIDs[i]] = i;
+
+	auto newRowColors = decltype(_rowColors)(_rowColors.size());
+	auto newRowColorsSet = decltype(_rowColorsSet)(_rowColorsSet.size());
+	auto newRowSelectionColors = decltype(_rowSelectionColors)(_rowSelectionColors.size());
+	auto newRowSelectionColorsSet = decltype(_rowSelectionColorsSet)(_rowSelectionColorsSet.size());
+	auto newCellColors = decltype(_cellColors)(_cellColors.size());
+	auto newCellColorsSet = decltype(_cellColorsSet)(_cellColorsSet.size());
+	auto newRowIDs = decltype(_rowIDs)(_rowIDs.size());
+
+	for (int i = 0; i < childslots[1].size(); i++)
+	{
+		auto& row = childslots[1][i];
+		newRowIDs[i] = row->uuid;
+		row->info.location = i;
+		if (ids_to_index.find(row->uuid) == ids_to_index.end()) {
+			newRowColors[i]  = ImGui::ColorConvertFloat4ToU32(ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+			newRowColorsSet[i] = false;
+			newRowSelectionColors[i] = ImGui::ColorConvertFloat4ToU32(ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+			newRowSelectionColorsSet[i] = false;
+			newCellColors[i] = {};
+			newCellColorsSet[i] = {};
+			
+			for (int i = 0; i < _columns; i++)
+			{
+				newCellColorsSet.back().push_back(false);
+				newCellColors.back().push_back(ImGui::ColorConvertFloat4ToU32(ImVec4(0.0f, 0.0f, 0.0f, 0.0f)));
+			}
+		} else {
+			auto old_id = ids_to_index[row->uuid];
+			newRowColors[i] = _rowColors[old_id];
+			newRowColorsSet[i] = _rowColorsSet[old_id];
+			newRowSelectionColors[i] = _rowSelectionColors[old_id];
+			newRowSelectionColorsSet[i] = _rowSelectionColorsSet[old_id];
+			newCellColors[i] = _cellColors[old_id];
+			newCellColorsSet[i] = _cellColorsSet[old_id];
+		}
+	}
+
+	_rowColors = std::move(newRowColors);
+	_rowColorsSet = std::move(newRowColorsSet);
+	_rowSelectionColors = std::move(newRowSelectionColors);
+	_rowSelectionColorsSet = std::move(newRowSelectionColorsSet);
+	_cellColors = std::move(newCellColors);
+	_cellColorsSet = std::move(newCellColorsSet);
+	_rowIDs = std::move(newRowIDs);
 }
 
 void mvTable::handleSpecificKeywordArgs(PyObject* dict)
