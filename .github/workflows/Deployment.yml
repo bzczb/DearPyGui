@@ -11,8 +11,7 @@ on:
     
       version:
         description: 'Dear PyGui Version'
-        required: false
-        default: '1.12.0'
+        required: true
     
       deploy:
         description: 'Deploy (true will deploy to pypi)'
@@ -72,7 +71,7 @@ jobs:
 
   build-mac10-wheels:
 
-    runs-on: macos-11
+    runs-on: macos-12
     strategy:
       matrix:
         python-version: [ "3.12" ]
@@ -111,48 +110,46 @@ jobs:
         path: ${{ github.workspace }}/dist/*.whl
         retention-days: 2
 
-  # Dont have a pro account
-  # not doing the silicon build then
-  #
-  # build-mac-silicon-wheels:
+  build-mac-silicon-wheels:
 
-  #   runs-on: macos-latest-xlarge
-  #   strategy:
-  #     matrix:
-  #       python-version: [ "3.10", "3.11", "3.12" ]
+    runs-on: macos-14
+    strategy:
+      matrix:
+        python-version: [ "3.12" ]
+        # python-version: [ "3.10", "3.11", "3.12" ]
 
-  #   steps:
+    steps:
 
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-  #     - name: Setup Python ${{ matrix.python-version }}
-  #       uses: actions/setup-python@v4
-  #       with:
-  #         python-version: ${{ matrix.python-version }}
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
 
-  #     - name: Retrieve submodules
-  #       run: |
-  #         git submodule update --init --recursive ./thirdparty/imgui
-  #         git submodule update --init --recursive ./thirdparty/glfw
+      - name: Retrieve submodules
+        run: |
+          git submodule update --init --recursive ./thirdparty/imgui
+          git submodule update --init --recursive ./thirdparty/glfw
 
-  #     - name: Mark Versions
-  #       run: |
-  #         cd $GITHUB_WORKSPACE
-  #         echo ${{ github.event.inputs.version }} > version_number.txt
+      - name: Mark Versions
+        run: |
+          cd $GITHUB_WORKSPACE
+          echo ${{ github.event.inputs.version }} > version_number.txt
 
-  #     - name: Build Wheel
-  #       run: |
-  #         cd $GITHUB_WORKSPACE
-  #         python -m pip install --upgrade pip twine wheel setuptools
-  #         python -m setup bdist_wheel --plat-name macosx-13.0-arm64 --dist-dir dist
+      - name: Build Wheel
+        run: |
+          cd $GITHUB_WORKSPACE
+          python -m pip install --upgrade pip twine wheel setuptools
+          python -m setup bdist_wheel --plat-name macosx-13.0-arm64 --dist-dir dist
 
-  #     - name: Upload MacOS ${{ matrix.python-version }} Wheel
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: apple10sbuild${{ matrix.python-version }}
-  #         path: ${{ github.workspace }}/dist/*.whl
-  #         retention-days: 2
+      - name: Upload MacOS ${{ matrix.python-version }} Wheel
+        uses: actions/upload-artifact@v3
+        with:
+          name: apple10sbuild${{ matrix.python-version }}
+          path: ${{ github.workspace }}/dist/*.whl
+          retention-days: 2
 
   build-linux-wheels:
 
@@ -201,7 +198,7 @@ jobs:
 
   releases:
     
-    needs: [build-windows-wheels, build-mac10-wheels, build-linux-wheels]  # build-mac-silicon-wheels
+    needs: [build-windows-wheels, build-mac10-wheels, build-linux-wheels, build-mac-silicon-wheels]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
 
@@ -227,7 +224,7 @@ jobs:
 
   deploy-packages:
 
-    needs: [build-windows-wheels, build-mac10-wheels, build-linux-wheels]  # build-mac-silicon-wheels
+    needs: [build-windows-wheels, build-mac10-wheels, build-linux-wheels, build-mac-silicon-wheels]
     runs-on: windows-2019
 
     steps:
@@ -254,7 +251,7 @@ jobs:
         python -m twine upload windowsbuild*/* -u __token__ -p ${{ secrets.PYPI_PASSWORD }} --skip-existing
         python -m twine upload apple10build*/* -u __token__ -p ${{ secrets.PYPI_PASSWORD }} --skip-existing
         python -m twine upload linuxbuild*/* -u __token__ -p ${{ secrets.PYPI_PASSWORD }} --skip-existing
-      # python -m twine upload apple10sbuild*/* -u __token__ -p ${{ secrets.PYPI_PASSWORD }} --skip-existing
+        python -m twine upload apple10sbuild*/* -u __token__ -p ${{ secrets.PYPI_PASSWORD }} --skip-existing
 
     - name: Test PyPi Deployment
       shell: cmd
@@ -264,4 +261,4 @@ jobs:
         python -m twine upload --repository testpypi windowsbuild*/* -u __token__ -p ${{ secrets.TEST_PYPI_PASSWORD }} --skip-existing
         python -m twine upload --repository testpypi apple10build*/* -u __token__ -p ${{ secrets.TEST_PYPI_PASSWORD }} --skip-existing
         python -m twine upload --repository testpypi linuxbuild*/* -u __token__ -p ${{ secrets.TEST_PYPI_PASSWORD }} --skip-existing
-      # python -m twine upload --repository testpypi apple10sbuild*/* -u __token__ -p ${{ secrets.TEST_PYPI_PASSWORD }} --skip-existing
+        python -m twine upload --repository testpypi apple10sbuild*/* -u __token__ -p ${{ secrets.TEST_PYPI_PASSWORD }} --skip-existing
